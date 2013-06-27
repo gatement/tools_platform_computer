@@ -1,0 +1,23 @@
+{application, computer,
+ [
+  {description, "computer device (a mqtt client)"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {env, [
+    {mqtt_broker_host, "localhost"},
+    {mqtt_broker_port, 1883},
+
+    {username, "admin"},
+    {password, "admin"},
+    
+    {client_id, "000000000003"},
+
+    {reconnect_wait_time, 10000},
+    {keep_alive_timer, 60000}
+  ]},
+  {mod, {computer_app, []}}
+ ]}.
