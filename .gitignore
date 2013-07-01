@@ -6,6 +6,7 @@ deps
 *.swp
 *.*~
 ebin
+priv/log
 local_linux.config
 local_win.config
 run_linux.sh
