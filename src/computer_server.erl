@@ -29,7 +29,6 @@ start_link() ->
         username = UserName,
         password = Password
     },
-    %error_logger:info_msg("[~p] State: ~p~n", [?MODULE, State]),
 
     error_logger:info_msg("[~p] was started.~n", [?MODULE]),
 
@@ -85,18 +84,18 @@ loop(State, SendHeartbeat) ->
 
     receive
         {tcp, _Socket, Msg} -> 
-            error_logger:info_msg("[~p] received tcp data: ~p~n", [?MODULE, Msg]),
+	    %error_logger:info_msg("[~p] received tcp data: ~p~n", [?MODULE, Msg]),
 
             handle_packages(State, Msg);
 
         {tcp_closed, _Socket} ->
-            error_logger:info_msg("[~p] tcp_closed~n", [?MODULE]),
+            %error_logger:info_msg("[~p] tcp_closed~n", [?MODULE]),
 
             Reason = "tcp_closed",
             reconnect(State, Reason);
 
-        AnyMsg ->
-            error_logger:info_msg("[~p] received any data ~p: ~p~n", [?MODULE, AnyMsg]),
+        _AnyMsg ->
+            %error_logger:info_msg("[~p] received any data ~p: ~p~n", [?MODULE, _AnyMsg]),
             loop(State, false)
 
     after
@@ -141,7 +140,7 @@ send_uptime(State) ->
     Topic = lists:flatten(io_lib:format("/~s/uptime", [State#state.client_id])),
 
     UptimeData = mqtt_cmd:uptime(Topic, Uptime),
-    error_logger:info_msg("[~p] is sending Uptime: ~p~n", [?MODULE, UptimeData]),
+    %error_logger:info_msg("[~p] is sending Uptime: ~p~n", [?MODULE, UptimeData]),
     gen_tcp:send(State#state.socket, UptimeData),
 
     ok.

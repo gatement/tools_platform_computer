@@ -3,7 +3,11 @@ deps
 *.o
 *.beam
 *.plt
+*.swp
+*.*~
 ebin
 local_linux.config
-run.sh
+local_win.config
+run_linux.sh
+run_win.sh
 erl_crash.dump
