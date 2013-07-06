@@ -137,9 +137,7 @@ send_uptime(State) ->
     {Uptime0, _} = erlang:statistics(wall_clock), % in millisecond
     Uptime = Uptime0 div 1000,
 
-    Topic = lists:flatten(io_lib:format("/~s/uptime", [State#state.client_id])),
-
-    UptimeData = mqtt_cmd:uptime(Topic, Uptime),
+	{_, UptimeData} = mqtt_cmd:uptime(State#state.client_id, Uptime),
     %error_logger:info_msg("[~p] is sending Uptime: ~p~n", [?MODULE, UptimeData]),
     gen_tcp:send(State#state.socket, UptimeData),
 
