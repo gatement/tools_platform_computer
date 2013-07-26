@@ -6,7 +6,7 @@
 		strip_fixed_header/1,
 		get_qos/1,
 		get_msg_length/1,
-		extract_publish_msg/1,
+		extract_publish_info/1,
 		extract_connect_info/1]).
 
 -vsn("0.1.0").
@@ -66,7 +66,7 @@ get_qos(Msg) ->
 	(Byte0 bsr 1) band 2#00000011.
 
 
-extract_publish_msg(Msg) ->
+extract_publish_info(Msg) ->
 	{FixedHeaderLength, _} = get_msg_length(Msg),
 
 	TopicLengthH = binary:at(Msg, FixedHeaderLength),

@@ -9,7 +9,7 @@
 
 process_data_publish(_SourcePid, _Socket, RawData) ->
     %error_logger:info_msg("[~p] received data: ~p~n", [?MODULE, RawData]),
-    {Topic, Payload} = mqtt_utils:extract_publish_msg(RawData),
+    {Topic, Payload} = mqtt_utils:extract_publish_info(RawData),
     ClientId = string:substr(Topic, 2, 12),
     <<TypeCode:8/integer, _/binary>> = Payload,
 
