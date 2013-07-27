@@ -6,8 +6,9 @@
 		strip_fixed_header/1,
 		get_qos/1,
 		get_msg_length/1,
+		extract_connect_info/1,
 		extract_publish_info/1,
-		extract_connect_info/1]).
+		extract_publish_ack_info/1]).
 
 -vsn("0.1.0").
 
@@ -66,32 +67,6 @@ get_qos(Msg) ->
 	(Byte0 bsr 1) band 2#00000011.
 
 
-extract_publish_info(Msg) ->
-	{FixedHeaderLength, _} = get_msg_length(Msg),
-
-	TopicLengthH = binary:at(Msg, FixedHeaderLength),
-	TopicLengthL = binary:at(Msg, FixedHeaderLength + 1),
-	TopicLength = TopicLengthH * 256 + TopicLengthL,
-	Topic = erlang:binary_to_list(binary:part(Msg, FixedHeaderLength + 2, TopicLength)),
-
-	Qos = get_qos(Msg),
-
-	BytesBeforePayload = if
-		Qos > 0 ->
-			MsgIdLengthH = binary:at(Msg, FixedHeaderLength + TopicLength+ 2),
-			MsgIdLengthL = binary:at(Msg, FixedHeaderLength + TopicLength + 3),
-			MsgIdLength = MsgIdLengthH * 256 + MsgIdLengthL,
-
-			FixedHeaderLength + TopicLength + MsgIdLength + 4;			
-		true ->
-			FixedHeaderLength + TopicLength + 2
-	end,
-
-	Payload = binary:part(Msg, BytesBeforePayload, erlang:byte_size(Msg) - BytesBeforePayload),
-
-	{Topic, Payload}.
-
-
 extract_connect_info(Data) ->
     RestData1 = mqtt_utils:strip_fixed_header(Data),
 
@@ -125,6 +100,38 @@ extract_connect_info(Data) ->
     end,
 
     {ClientId, KeepAliveTimer, UserName, Password}.
+
+
+extract_publish_info(Msg) ->
+	{FixedHeaderLength, _RestLength} = get_msg_length(Msg),
+
+	TopicLengthH = binary:at(Msg, FixedHeaderLength),
+	TopicLengthL = binary:at(Msg, FixedHeaderLength + 1),
+	TopicLength = TopicLengthH * 256 + TopicLengthL,
+	Topic = erlang:binary_to_list(binary:part(Msg, FixedHeaderLength + 2, TopicLength)),
+
+	Qos = get_qos(Msg),
+
+	BytesBeforePayload = if
+		Qos > 0 ->
+			FixedHeaderLength + TopicLength + 4;			
+		true ->
+			FixedHeaderLength + TopicLength + 2
+	end,
+
+	Payload = binary:part(Msg, BytesBeforePayload, erlang:byte_size(Msg) - BytesBeforePayload),
+
+	{Topic, Payload}.
+
+
+extract_publish_ack_info(Msg) ->
+	{FixedHeaderLength, _RestLength} = get_msg_length(Msg),
+
+	MsgIdH = binary:at(Msg, FixedHeaderLength),
+	MsgIdL = binary:at(Msg, FixedHeaderLength + 1),
+	MsgId = MsgIdH * 256 + MsgIdL,
+
+	{MsgId}.
 
 
 %% ===================================================================
